@@ -8,8 +8,24 @@ import os
 #------- [ENV VARIABLES] -------#
 openai_gpt_key = os.environ['OPENAI_GPT_KEY']
 
+#------- [VARIABLES] -------#
+weak_total_rate_limit = 1200 # This is weak because it does not use a persistent database to track usage.
+rate_limit_usage = 0
 
 #------- [FUNCTIONS] -------#
+
+def check_rate_limit():
+    """Check the rate limit for the API
+    Returns:
+        bool: True if rate limit is not reached, False if rate limit is reached
+    """
+    if rate_limit_usage> weak_total_rate_limit:
+        raise Exception("Rate limit reached")
+    else:
+        rate_limit_usage += 1
+        return False
+
+
 def ask_chatgpt(query):
     """Ask ChatGPT using Openai
     Inputs:
@@ -17,10 +33,16 @@ def ask_chatgpt(query):
     Returns:
         response.json(): Json form of response from API
     """
- 
+    if check_rate_limit():
+        return "Rate limit reached. Try again later."
+
     return ask_gpt_4(query, temperature=0.3)
 
 def ask_gpt_3(query, temperature=0.1):
+
+    if check_rate_limit():
+        return "Rate limit reached. Try again later."
+    
     # Ask ChatGPT3 using openai
     
     url = 'https://api.openai.com/v1/chat/completions'
@@ -39,6 +61,10 @@ def ask_gpt_3(query, temperature=0.1):
     return response.json()["choices"][0]["message"]['content']
 
 def ask_gpt_4(query, temperature=0.2):
+
+    if check_rate_limit():
+        return "Rate limit reached. Try again later."
+
     # Ask ChatGPT using openai
     
     url = 'https://api.openai.com/v1/chat/completions'
