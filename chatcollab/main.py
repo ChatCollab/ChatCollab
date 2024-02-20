@@ -3,6 +3,19 @@ import threading
 from chatcollab.clear_slack import delete_all_messages_files_in_channel
 from chatcollab.agent.agent import *
 from chatcollab.agent.timeline_interface import update_institutional_knowledge, clear_timeline
+import os
+
+# Set environment variable
+slack_channel_id = os.environ['SLACK_CHANNEL_ID']
+
+# Confirm all os environment variables are set
+env_variable_names = ['SLACK_API_TOKEN', 'SLACK_API_TOKEN', 'OPENAI_GPT_KEY']
+for env_variable_name in env_variable_names:
+    if env_variable_name not in os.environ:
+        print(f"[WARNING] Environment variable {env_variable_name} is not set. Please set it.")
+    else:
+        print(f"[INFO] Environment variable {env_variable_name} is set.")
+
 
 # ---- [Slack Source] ----
 from chatcollab.source.source import run_slack_source
@@ -130,7 +143,7 @@ if len(st.session_state.agents) < 5:
         name = st.text_input("Agent Name (Put Role in Parentheses)", value=st.session_state['name'])
         role = st.text_input("Role", value=st.session_state['role'])
         description = st.text_area("Description", value=st.session_state['description'], height=100)
-        channel_id = "C05QHBA5066"
+        channel_id = slack_channel_id
         create_agent = st.form_submit_button("Create Agent")
 
         if create_agent and name and role and description and channel_id:
