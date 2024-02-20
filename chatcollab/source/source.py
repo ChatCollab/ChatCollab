@@ -1,5 +1,5 @@
-from agent.timeline_interface import *
-from source.slack_functions import post_slack_message
+from chatcollab.agent.timeline_interface import *
+from chatcollab.source.slack_functions import post_slack_message
 import time
 
 public_key = "placeholder"

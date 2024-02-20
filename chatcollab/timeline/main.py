@@ -1,11 +1,11 @@
 # FastAPI for Interfacing with the Central Event Timeline (CET)
 
-#uvicorn main:app --reload
+#uvicorn timeline.main:app --reload
 
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-import models
-from schemas import *
+import chatcollab.timeline.models as models
+from chatcollab.timeline.schemas import *
 
 app = FastAPI(title="Agent and Events API", description="Manage Agents and their Events", version="1.0")
 
