@@ -7,7 +7,7 @@ docker build -f Dockerfile -t chatcollab:latest .
 
 ### Run docker image in same directory as env file
 ~~~
-docker run --env-file .env -p 8000:8000 chatcollab:latest
+docker run --env-file .env -p 8000:8000 -p 8080:8080 chatcollab:latest
 ~~~
 
 
