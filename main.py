@@ -4,6 +4,17 @@ from clear_slack import delete_all_messages_files_in_channel
 from agent.agent import *
 from agent.timeline_interface import update_institutional_knowledge, clear_timeline
 
+# ---- [Slack Source] ----
+from source.source import run_slack_source
+
+# Start async function of run_slack_source
+slack_thread = threading.Thread(target=run_slack_source)
+
+# Start the thread
+slack_thread.start()
+# -------------------------
+
+
 st.header("Autonomous Agent Collaboration Engine (AACE)")
 st.caption("Enabling autonomous AI agents to collaborate with humans via Slack.")
 
