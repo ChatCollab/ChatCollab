@@ -21,18 +21,6 @@ def get_channel_history(channel, count=100):
         print(f"Error retrieving channel history: {e}")
         return []
 
-# See if last message was from the bot
-def last_message_from_bot(channel):
-    messages = get_channel_history(channel)
-    if messages:
-        last_message = messages[0]
-        if last_message['username'] == "Peter Williams (AI)":
-            return True
-        else:
-            return False
-    else:
-        return False
-
 def style_channel_history(channel_history):
     # Style history
     styled_history = []
