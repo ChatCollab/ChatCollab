@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Timeline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #timeline {
+            width: 100%;
+            height: 60px;
+            position: relative;
+            white-space: nowrap;
+            padding-top: 0px;
+            padding-bottom:10px;
+        }
+        .event {
+            position: absolute;
+            bottom: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #5a67d8;
+            cursor: pointer;
+        }
+        .event-info {
+            display: block;
+            position: absolute;
+            bottom: -70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: max-content;
+            max-width: 100%;
+            background-color: white;
+            border: 1px solid #DDD;
+            border-radius: 5px;
+            padding: 10px;
+            z-index: 2000;
+        }
+
+        .event-table {
+            width: 100%;
+            margin-top: 50px;
+            border-collapse: collapse;
+        }
+        .event-table th,
+        .event-table td {
+            border: 1px solid #DDD;
+            padding: 8px;
+            text-align: left;
+        }
+        .event-table th {
+            background-color: #F3F4F6;
+        }
+        .line {
+            position: absolute;
+            width: 2px;
+            background: #5a67d8;
+            bottom: 10px;
+        }
+        .tooltip {
+            width: 120px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: opacity 0.3s;
+        }
+        .event:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal {
+        display: none;
+        position: fixed;
+        z-index: 10;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0,0.4);
+        padding-top: 60px;
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .tags span {
+        margin-right: 4px;
+    }
+    </style>
+</head>
+<body>
+
+    <div class="flex justify-center p-10">
+        <div id="timeline" class="relative border-2 border-gray-300 rounded-lg w-full max-w-6xl"></div>
+
+    </div>
+    <div id="timeline-markers" class="flex justify-between px-10 mx-auto" style="margin-top:-35px;max-width:76rem;"></div>
+
+    
+    <div class="max-w-6xl mx-auto my-8 overflow-x-auto">
+        <table id="event-table" class="event-table min-w-full bg-white divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Id</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agent</th>
+
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                <!-- Event rows will be added here -->
+            </tbody>
+        </table>
+    </div>
+
+<script>
+
+    function addTimelineMarkers() {
+    const markersContainer = document.getElementById('timeline-markers');
+    const totalMinutes = 3;
+    const interval = 0.5;
+    const numberOfMarkers = totalMinutes / interval;
+
+    for (let i = 0; i <= numberOfMarkers; i++) {
+        const marker = document.createElement('div');
+        const time = totalMinutes - (i * interval);
+
+        if (time % 1 !== 0) {
+            marker.textContent = `${time-0.5}:30`;
+            marker.className = 'text-xs';
+            markersContainer.appendChild(marker);
+            continue;
+        }
+
+        marker.textContent = `${time}:00`;
+        marker.className = 'text-xs';
+        markersContainer.appendChild(marker);
+    }
+}
+
+    // Call this function once when the page loads
+    addTimelineMarkers();
+
+
+    let globalAgentList = null;
+
+    async function getAgents() {
+    try {
+        const response = await fetch('/list_agents');
+        const data = await response.json();
+        // Store the result in the global variable
+        globalAgentList = data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+    }
+
+    // Get the name of the agent from the ID
+    function getAgentName(agentId, localAgentList) {
+    const agent = localAgentList.find(agent => agent.id === agentId);
+    return agent ? agent.name : 'Unknown';
+    }
+
+  
+    async function fetchEvents() {
+        const response = await fetch('list_events/?public_key=placeholder&private_key=placeholder');
+        const events = await response.json();
+        const timelineElement = document.getElementById('timeline');
+        const eventTableBody = document.getElementById('event-table').querySelector('tbody');
+        const thirtyMinutesAgo = new Date(new Date().getTime() - (3 * 60 * 1000));
+        timelineElement.innerHTML = ''; // Clear the timeline
+        eventTableBody.innerHTML = ''; // Clear the table
+
+
+        events.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)); // Sort events by timestamp
+        //reverse order
+        events.reverse();
+
+        events.forEach(event => {
+            const eventTime = new Date(event.created_at);
+            if (eventTime >= thirtyMinutesAgo) {
+                // Timeline event dot and info
+                const leftPosition = ((eventTime - thirtyMinutesAgo) / (3 * 60 * 1000)) * timelineElement.clientWidth;
+                
+                // Create the dot
+                const eventDiv = document.createElement('div');
+                eventDiv.classList.add('event');
+                eventDiv.style.left = `${leftPosition}px`;
+                eventDiv.style.bottom = '20px';
+                eventDiv.style.marginBottom = '10px';
+            
+                // Create the caption for the dot with event ID
+                const captionDiv = document.createElement('div');
+                captionDiv.className = 'absolute text-center mt-2 text-gray-500 font-bold'; // Set a fixed width for uniform appearance
+                captionDiv.textContent = `${event.id}`;
+                captionDiv.style.marginLeft = '5px';
+                
+                captionDiv.style.left = `${leftPosition}px`;
+                captionDiv.style.bottom = '-2px'; // Adjust as needed
+                captionDiv.style.transform = 'translateX(-50%)';
+                captionDiv.style.paddingBottom = '10px';
+
+                // Append the elements to the timeline
+                timelineElement.appendChild(eventDiv);
+                timelineElement.appendChild(captionDiv);
+            }
+            
+            // Event table row
+            const row = eventTableBody.insertRow();
+            row.insertCell().textContent = event.id;
+
+            row.insertCell().textContent = getAgentName(event.source_id, globalAgentList);
+
+            row.insertCell().textContent = event.title;
+            row.insertCell().textContent = eventTime.toLocaleString();
+            row.insertCell().textContent = event.tags.join(', ');
+        });
+    }
+
+    getAgents().then(() => {
+        // Now you can use globalAgentList in other functions
+        console.log(globalAgentList);
+
+        setInterval(fetchEvents, 1000); // Update every second
+        fetchEvents(); // Initial fetch
+    });
+    
+</script>
+
+</body>
+</html>

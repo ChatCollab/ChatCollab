@@ -1,1 +1,1 @@
-# ChatCollab
+# ChatCollab v3.2
