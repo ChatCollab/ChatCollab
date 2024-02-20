@@ -1,24 +1,15 @@
 import streamlit as st
 import threading
-from chatcollab.clear_slack import delete_all_messages_files_in_channel
-from chatcollab.agent.agent import *
-from chatcollab.agent.timeline_interface import update_institutional_knowledge, clear_timeline
+from clear_slack import delete_all_messages_files_in_channel
+from agent.agent import *
+from agent.timeline_interface import update_institutional_knowledge, clear_timeline
 import os
 
 # Set environment variable
 slack_channel_id = os.environ['SLACK_CHANNEL_ID']
 
-# Confirm all os environment variables are set
-env_variable_names = ['SLACK_API_TOKEN', 'SLACK_API_TOKEN', 'OPENAI_GPT_KEY']
-for env_variable_name in env_variable_names:
-    if env_variable_name not in os.environ:
-        print(f"[WARNING] Environment variable {env_variable_name} is not set. Please set it.")
-    else:
-        print(f"[INFO] Environment variable {env_variable_name} is set.")
-
-
 # ---- [Slack Source] ----
-from chatcollab.source.source import run_slack_source
+from source.source import run_slack_source
 
 # Start async function of run_slack_source
 slack_thread = threading.Thread(target=run_slack_source)
@@ -35,6 +26,15 @@ if 'is_first_run' not in st.session_state:
     print("Cleared timeline for new run!")
     clear_timeline()
     st.session_state.is_first_run = False
+
+    # Confirm all os environment variables are set
+    env_variable_names = ['SLACK_API_TOKEN', 'SLACK_API_TOKEN', 'OPENAI_GPT_KEY']
+    for env_variable_name in env_variable_names:
+        if env_variable_name not in os.environ:
+            print(f"[WARNING] Environment variable {env_variable_name} is not set. Please set it.")
+        else:
+            print(f"[INFO] Environment variable {env_variable_name} is set.")
+
 
 # Initialize session state variables
 if 'name' not in st.session_state:

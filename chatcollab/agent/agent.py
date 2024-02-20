@@ -1,10 +1,10 @@
-from chatcollab.agent.timeline_interface import get_timeline_events, post_timeline_event, get_institutional_knowledge
-from chatcollab.source.slack_functions import get_formatted_channel_history
+from agent.timeline_interface import get_timeline_events, post_timeline_event, get_institutional_knowledge
+from source.slack_functions import get_formatted_channel_history
 import time
 import random
 from datetime import datetime, timedelta
 import json
-from chatcollab.source.openai import ask_chatgpt, ask_gpt_3, ask_gpt_4
+from source.openai import ask_chatgpt, ask_gpt_3, ask_gpt_4
 
 
 globals()["last_prompt_with_no_as_response"] = {}
