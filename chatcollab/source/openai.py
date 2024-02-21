@@ -9,8 +9,8 @@ import os
 openai_gpt_key = os.environ['OPENAI_GPT_KEY']
 
 #------- [VARIABLES] -------#
-weak_total_rate_limit = 1200 # This is weak because it does not use a persistent database to track usage.
-rate_limit_usage = 0
+globals()["weak_total_rate_limit"] = 1200 # This is weak because it does not use a persistent database to track usage.
+globals()["rate_limit_usage"] = 0
 
 #------- [FUNCTIONS] -------#
 
@@ -19,10 +19,11 @@ def check_rate_limit():
     Returns:
         bool: True if rate limit is not reached, False if rate limit is reached
     """
-    if rate_limit_usage> weak_total_rate_limit:
+    if globals()["rate_limit_usage"] > globals()["weak_total_rate_limit"]:
         raise Exception("Rate limit reached")
     else:
-        rate_limit_usage += 1
+        globals()["rate_limit_usage"] += 1
+        print("\n\nNumber of requests made: ", globals()["rate_limit_usage"],"\n\n")
         return False
 
 
