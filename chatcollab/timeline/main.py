@@ -51,8 +51,9 @@ def create_event(public_key: str, private_key: str, event: EventCreateSchema, db
     # if not agent:
     #     raise HTTPException(status_code=404, detail="Agent not found")
 
-    # Temporary while not requiring auth:
-    agent = {"id":0}
+    # Temporary while not requiring auth: (placeholder with id as 0)
+    agent = models.Agent()
+    agent.id = 0
 
     # Create the event for the agent
     db_event = models.Event(title=event.title, source_id=agent.id, tags=event.tags, payload=event.payload)
@@ -73,8 +74,8 @@ from fastapi.responses import HTMLResponse
 
 @app.get("/agents", response_class=HTMLResponse)
 def get_html():
-    return HTMLResponse(open("./templates/agents.html").read())
+    return HTMLResponse(open("./chatcollab/timeline/templates/agents.html").read())
 
 @app.get("/timeline", response_class=HTMLResponse)
 def get_html_timeline():
-    return HTMLResponse(open("./templates/timeline.html").read())
+    return HTMLResponse(open("./chatcollab/timeline/templates/timeline.html").read())
