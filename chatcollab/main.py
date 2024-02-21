@@ -1,9 +1,9 @@
 import streamlit as st
-import threading
 from clear_slack import delete_all_messages_files_in_channel
 from agent.agent import *
 from agent.timeline_interface import update_institutional_knowledge, clear_timeline
 import os
+import asyncio
 
 # Set environment variable
 slack_channel_id = os.environ['SLACK_CHANNEL_ID']
@@ -11,11 +11,9 @@ slack_channel_id = os.environ['SLACK_CHANNEL_ID']
 # ---- [Slack Source] ----
 from source.source import run_slack_source
 
-# Start async function of run_slack_source
-slack_thread = threading.Thread(target=run_slack_source)
+# Start function of run_slack_source
+asyncio.run(run_slack_source())
 
-# Start the thread
-slack_thread.start()
 # -------------------------
 
 

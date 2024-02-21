@@ -1,6 +1,7 @@
 from agent.timeline_interface import *
 from source.slack_functions import post_slack_message
 import time
+import asyncio
 
 public_key = "placeholder"
 private_key = "placeholder"
@@ -44,5 +45,6 @@ async def run_slack_source():
             else:
                 pass
 
-        time.sleep(1)
+        await asyncio.sleep(1)
         print("Checking...")
+        print("Time: ", time.time())
