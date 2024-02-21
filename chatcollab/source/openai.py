@@ -9,7 +9,7 @@ import os
 openai_gpt_key = os.environ['OPENAI_GPT_KEY']
 
 #------- [VARIABLES] -------#
-globals()["weak_total_rate_limit"] = 1200 # This is weak because it does not use a persistent database to track usage.
+globals()["weak_total_rate_limit"] = 5000 # This is weak because it does not use a persistent database to track usage.
 globals()["rate_limit_usage"] = 0
 
 #------- [FUNCTIONS] -------#
