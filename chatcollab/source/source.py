@@ -1,7 +1,6 @@
 from agent.timeline_interface import *
 from source.slack_functions import post_slack_message
 import time
-import asyncio
 
 public_key = "placeholder"
 private_key = "placeholder"
@@ -9,7 +8,7 @@ private_key = "placeholder"
 SHORT_list_of_viewed_events = []
 SHORT_list_of_executed_events = [] # Only used for diagnostic purposes
 
-async def run_slack_source():
+def run_slack_source():
     while True:
         slack_events = filter_events_by_tag("to:slack", get_timeline_events(start=get_timestamp_x_minutes_ago(3)))
         for event in slack_events:
@@ -45,6 +44,5 @@ async def run_slack_source():
             else:
                 pass
 
-        await asyncio.sleep(1)
-        print("Checking...")
-        print("Time: ", time.time())
+        time.sleep(1)
+        print("Checking...", time.time())

@@ -3,19 +3,10 @@ from clear_slack import delete_all_messages_files_in_channel
 from agent.agent import *
 from agent.timeline_interface import update_institutional_knowledge, clear_timeline
 import os
-import asyncio
+import threading 
 
 # Set environment variable
 slack_channel_id = os.environ['SLACK_CHANNEL_ID']
-
-# ---- [Slack Source] ----
-from source.source import run_slack_source
-
-# Start function of run_slack_source
-asyncio.run(run_slack_source())
-
-# -------------------------
-
 
 st.header("Autonomous Agent Collaboration Engine (AACE)")
 st.caption("Enabling autonomous AI agents to collaborate with humans via Slack.")
