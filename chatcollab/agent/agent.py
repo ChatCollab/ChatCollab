@@ -129,8 +129,8 @@ def create_run_autonomous_agent(agent_name, description_of_role, persona, slack_
 def choose_action(agent_name, description_of_role, persona, slack_channel, print_to_output):
 
     if get_formatted_channel_history("C05QHBA5066")==globals()["last_prompt_with_no_as_response"][agent_name]:
-        print("Already considered as NO. Waiting for new messages.")
-        print_to_output("Already considered as NO. Waiting for new messages.\n\n")
+        print("Already considered as no (option 3). Waiting for new messages.")
+        print_to_output("Already considered as no (option 3). Waiting for new messages.\n")
         return 3, None
 
     instructions = f"""<Instructions>You are an AI teammate, {agent_name}, on Slack. As you are autonomous, you must decide if you want to take an action. As an AI, you CAN create any files including code. You have the transcript above, emulate human behavior. Do not hallucinate updating or sending something if you do not see the content in the history: Nothing exists outside the provided transcript.
