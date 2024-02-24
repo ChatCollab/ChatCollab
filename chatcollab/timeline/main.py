@@ -6,6 +6,9 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import chatcollab.timeline.models as models
 from chatcollab.timeline.schemas import *
+import json
+
+filename_openai_log = "openai_log.json"
 
 app = FastAPI(title="Agent and Events API", description="Manage Agents and their Events", version="1.0")
 
@@ -78,3 +81,29 @@ def get_html():
 @app.get("/timeline", response_class=HTMLResponse)
 def get_html_timeline():
     return HTMLResponse(open("./chatcollab/timeline/templates/timeline.html").read())
+
+# Read openai logs and return
+@app.get("/openai_logs")
+def get_openai_logs():
+    try:
+        # Read existing data
+        with open(filename_openai_log, "r") as file:
+            data = json.load(file)
+
+            # return new json with total number of logs, and frequency of logs for each represented hour and date
+            total_logs = len(data)
+            frequency = {}
+            for log in data:
+                date = log["timestamp"].split("T")[0]
+                hour = log["timestamp"].split("T")[1].split(":")[0]
+                if date not in frequency:
+                    frequency[date] = {}
+                if hour not in frequency[date]:
+                    frequency[date][hour] = 1
+                else:
+                    frequency[date][hour] += 1
+            data = {"total_number_of_logs":total_logs, "frequency":frequency}
+    except FileNotFoundError:
+        data = {"error":"No logs found"}
+    
+    return data
