@@ -35,7 +35,6 @@ def list_agents(db: Session = Depends(get_db)):
 
 @app.get("/list_events/", description="List all Events with Auth of specified Agent", response_model=List[EventSchema])
 def list_events(public_key: str, private_key: str, db: Session = Depends(get_db)):
-
     # Add the following to require auth of public and private key from an agent:
     # agent = db.query(models.Agent).filter(models.Agent.public_key == public_key, models.Agent.private_key == private_key).first()
     # if not agent:

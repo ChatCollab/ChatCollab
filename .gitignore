@@ -1,3 +1,7 @@
+# Custom
+openai_log.json
+allowed_threads.json
+
 # Database
 *.db
 

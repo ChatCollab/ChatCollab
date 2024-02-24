@@ -4,15 +4,38 @@ from agent.agent import *
 from agent.timeline_interface import update_institutional_knowledge, clear_timeline
 import os
 import threading 
+import random
 
 # Set environment variable
 slack_channel_id = os.environ['SLACK_CHANNEL_ID']
 
+# File
+filename = 'allowed_threads.json'
+filename_openai_log = "openai_log.json"
+
+
 st.header("Autonomous Agent Collaboration Engine (AACE)")
 st.caption("Enabling autonomous AI agents to collaborate with humans via Slack.")
 
+# Button to download the log file
+if os.path.exists(filename_openai_log):
+    with open(filename_openai_log, "rb") as file:
+        btn = st.download_button(
+                label="Download OpenAI Log",
+                data=file,
+                file_name=filename_openai_log,
+                mime="application/json"
+            )
+
 if 'is_first_run' not in st.session_state:
     print("Cleared timeline for new run!")
+
+    # Clear json file
+    with open(filename, 'w') as f:
+        json.dump([], f)
+
+    print("Cleared json file.")
+
     clear_timeline()
     st.session_state.is_first_run = False
 
@@ -34,10 +57,13 @@ if 'description' not in st.session_state:
     st.session_state['description'] = ""
 if 'knowledge' not in st.session_state:
     st.session_state['knowledge'] = "In our software team, the CEO coordinates the timeline for each project. The product manager and developers do not start work until it has been approved by the CEO. Once that occurs, the product manager first creates and shares a PRD with the team. Development does not start until this PRD is approved by the CEO. Then, the software with test cases is developed. It is important for all code to have strong documentation through inline comments."
-
+# Init in session
+if 'Agents_to_allow' not in st.session_state:
+    st.session_state['Agents_to_allow'] = []
 
 if 'is_deleting' not in st.session_state:
     st.session_state.is_deleting = False
+
 
 # Function to wrap delete operation
 def delete_messages():
@@ -116,14 +142,14 @@ if st.session_state.get('fill_isabelle'):
     st.session_state['fill_isabelle'] = False
 
 
-def parent_create_run_autonomous_agent(name, role, description, channel_id, output):
+def parent_create_run_autonomous_agent(name, role, description, channel_id, output, random_id):
     # Add everything from print to output
     def print_to_output(message):
         #add message to top of output
         output.insert(0, message)
         print(message)
 
-    create_run_autonomous_agent(name, role, description, channel_id, print_to_output)
+    create_run_autonomous_agent(name, role, description, channel_id, print_to_output, random_id)
     pass
 
 # Limit to 5 agents
@@ -137,8 +163,20 @@ if len(st.session_state.agents) < 5:
 
         if create_agent and name and role and description and channel_id:
             output = []
-            agent_thread = threading.Thread(target=parent_create_run_autonomous_agent, args=(name, role, description, channel_id, output))
+            # Create random ID
+            random_id = random.randint(0, 1000000)
+            st.session_state['Agents_to_allow'].append(random_id)
+            print("Agents to allow: ", st.session_state['Agents_to_allow'])
+
+            # add to json
+            with open(filename, 'w') as f:
+                json.dump(st.session_state['Agents_to_allow'], f)
+
+            print(f"List stored in {filename}")
+
+            agent_thread = threading.Thread(target=parent_create_run_autonomous_agent, args=(name, role, description, channel_id, output, random_id))
             agent_thread.start()
+
             st.session_state.agents.append({"name": name, "role": role, "output": output})
 
 st.markdown("---")
@@ -158,4 +196,4 @@ for agent in st.session_state.agents:
 
 # Rerun every 1 second to update the outputs
 time.sleep(1)
-st.experimental_rerun()
+st.rerun()

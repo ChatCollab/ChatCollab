@@ -84,7 +84,7 @@ class Event(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
     payload = Column(String)
-    created_at = Column(DateTime, default=lambda: datetime.utcnow() - timedelta(hours=8))
+    created_at = Column(DateTime, default=datetime.now())
     source_id = Column(Integer, ForeignKey('agent.id'))
     source = relationship("Agent", back_populates="events")
     _tags = Column("tags", String)

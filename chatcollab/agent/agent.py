@@ -4,10 +4,22 @@ import time
 import random
 from datetime import datetime, timedelta
 import json
-from source.openai import ask_chatgpt, ask_gpt_3, ask_gpt_4
+from source.openai import ask_chatgpt, ask_gpt_4
+import os
 
+slack_channel_id = os.environ['SLACK_CHANNEL_ID']
 
 globals()["last_prompt_with_no_as_response"] = {}
+
+def get_allowed_agents():
+    filename = 'allowed_threads.json'
+
+    # Reading the list back from the JSON file
+    with open(filename, 'r') as f:
+        allowed_agents = json.load(f)
+
+    print(f"List loaded from {filename}: {allowed_agents}")
+    return allowed_agents
 
 
 def get_n_min_before_now(n):
@@ -57,7 +69,7 @@ def replace_newlines_in_strings(obj):
     return obj
 
 def get_prompt_with_instructions(agent_name, description_of_role, persona, slack_channel, instructions):
-    chat_history = get_formatted_channel_history("C05QHBA5066")
+    chat_history = get_formatted_channel_history(slack_channel_id)
 
     # Add chat history
     prompt = "<Chat History>\nThe following is the chat history on Slack:\n\n"
@@ -78,11 +90,14 @@ def get_prompt_with_instructions(agent_name, description_of_role, persona, slack
 
     return prompt
 
-def create_run_autonomous_agent(agent_name, description_of_role, persona, slack_channel, print_to_output):
+def create_run_autonomous_agent(agent_name, description_of_role, persona, slack_channel, print_to_output, random_id):
     globals()["last_prompt_with_no_as_response"][agent_name] = ""
 
+    start_time = time.time()
+    timeout_amt_of_time = 60*60*3 # 3 hours
+
     timeout_val = 0
-    while True and timeout_val<10:
+    while timeout_val<10 and random_id in get_allowed_agents() and time.time()-start_time<timeout_amt_of_time:
         talked = False
         if True:
         # try:
@@ -116,7 +131,20 @@ def create_run_autonomous_agent(agent_name, description_of_role, persona, slack_
         # time.sleep(2)
         # Sleep random amount of time between 1-3 seconds
         time.sleep(random.randint(1,15)) #2,2 for no variation, 1,15 for variation
-        
+    
+    if random_id not in get_allowed_agents():
+        print_to_output("[TERMINATED] Agent has been stopped as thread is closed. This means another browser has the admin app open, and since only one agent system can run at a time in the same slack, this session has been stopped.\n\n **Please reload this page to restart**\n\n")
+        print("[TERMINATED] Agent has been stopped as thread is closed. This means another browser has the admin app open, and since only one agent system can run at a time in the same slack, this session has been stopped.\n\n **Please reload this page to restart**\n\n")
+        return
+    
+    if time.time()-start_time>=timeout_amt_of_time:
+        print_to_output("[TERMINATED] Agent has been stopped as it has been running for 3 hours. This is to prevent accidental use of resources.\n\n **Please reload this page to restart**\n\n")
+        print("[TERMINATED] Agent has been stopped as it has been running for 3 hours.\n\n **Please reload this page to restart**\n\n")
+        return
+    
+    print_to_output("[TERMINATED] Agent has been stopped due to 10 critical errors total.\n\n **Please reload this page to restart**\n\n")
+    print("[TERMINATED] Agent has been stopped due to 10 critical errors total.\n\n **Please reload this page to restart**\n\n")
+    return
 
 
 # Do you want to:
@@ -128,7 +156,7 @@ def create_run_autonomous_agent(agent_name, description_of_role, persona, slack_
 # @v3.2
 def choose_action(agent_name, description_of_role, persona, slack_channel, print_to_output):
 
-    if get_formatted_channel_history("C05QHBA5066")==globals()["last_prompt_with_no_as_response"][agent_name]:
+    if get_formatted_channel_history(slack_channel_id)==globals()["last_prompt_with_no_as_response"][agent_name]:
         print("Already considered as no (option 3). Waiting for new messages.")
         print_to_output("Already considered as no (option 3). Waiting for new messages.\n")
         return 3, None
@@ -189,7 +217,7 @@ Response (provide explaination first then the option):"""
         # print_to_output("Not time to talk")
 
         if anyone_typing==False: # In other words, did agent possibly decide not to talk when no one else is typing? If so, skip. Otherwise, store the last prompt.
-            globals()["last_prompt_with_no_as_response"][agent_name] = get_formatted_channel_history("C05QHBA5066")
+            globals()["last_prompt_with_no_as_response"][agent_name] = get_formatted_channel_history(slack_channel_id)
 
         return 3, None
     else:

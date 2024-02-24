@@ -3,7 +3,8 @@
 #------- [IMPORT LIBRARIES] -------#
 import requests
 import os
-
+import json
+from datetime import datetime
 
 #------- [ENV VARIABLES] -------#
 openai_gpt_key = os.environ['OPENAI_GPT_KEY']
@@ -12,7 +13,38 @@ openai_gpt_key = os.environ['OPENAI_GPT_KEY']
 globals()["weak_total_rate_limit"] = 5000 # This is weak because it does not use a persistent database to track usage.
 globals()["rate_limit_usage"] = 0
 
+
+filename_openai_log = "openai_log.json"
+
 #------- [FUNCTIONS] -------#
+
+def log_openai_usage(query, response):
+    """Log the usage of OpenAI in a JSON format for easy parsing and exportability.
+    Inputs:
+        query: String query input to chatgpt4
+        response: Response from OpenAI
+    """
+    log_entry = {
+        "timestamp": datetime.now().isoformat(),
+        "query": query,
+        "response": response
+    }
+    
+    try:
+        # Read existing data
+        with open(filename_openai_log, "r") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        # If file does not exist, start a new list
+        data = []
+    
+    # Append the new log entry
+    data.append(log_entry)
+    
+    # Write back to file
+    with open(filename_openai_log, "w") as file:
+        json.dump(data, file, indent=4)
+
 
 def check_rate_limit():
     """Check the rate limit for the API
@@ -37,29 +69,35 @@ def ask_chatgpt(query):
     if check_rate_limit():
         return "Rate limit reached. Try again later."
 
-    return ask_gpt_4(query, temperature=0.3)
+    response = ask_gpt_4(query, temperature=0.3)
 
-def ask_gpt_3(query, temperature=0.1):
+    return response
 
-    if check_rate_limit():
-        return "Rate limit reached. Try again later."
+# def ask_gpt_3(query, temperature=0.1):
+
+#     if check_rate_limit():
+#         return "Rate limit reached. Try again later."
     
-    # Ask ChatGPT3 using openai
+#     # Ask ChatGPT3 using openai
     
-    url = 'https://api.openai.com/v1/chat/completions'
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {openai_gpt_key}'
-    }
+#     url = 'https://api.openai.com/v1/chat/completions'
+#     headers = {
+#         'Content-Type': 'application/json',
+#         'Authorization': f'Bearer {openai_gpt_key}'
+#     }
 
-    data = {
-        "model": "gpt-3.5-turbo-1106",  # Model to use
-        "messages": [{"role": "user", "content": query}],
-        "temperature": temperature,
-    }
+#     data = {
+#         "model": "gpt-3.5-turbo-1106",  # Model to use
+#         "messages": [{"role": "user", "content": query}],
+#         "temperature": temperature,
+#     }
 
-    response = requests.post(url, headers=headers, json=data)
-    return response.json()["choices"][0]["message"]['content']
+#     response = requests.post(url, headers=headers, json=data)
+#     response = response.json()["choices"][0]["message"]['content']
+#     log_openai_usage(query, response)
+    
+#     return response
+
 
 def ask_gpt_4(query, temperature=0.2):
 
@@ -82,4 +120,7 @@ def ask_gpt_4(query, temperature=0.2):
     }
 
     response = requests.post(url, headers=headers, json=data)
-    return response.json()["choices"][0]["message"]['content']
+    response = response.json()["choices"][0]["message"]['content']
+    log_openai_usage(query, response)
+    
+    return response

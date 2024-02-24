@@ -6,3 +6,6 @@ __pycache__
 env
 *.env
 venv
+
+openai_log.json
+allowed_threads.json
