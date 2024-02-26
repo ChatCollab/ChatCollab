@@ -50,6 +50,14 @@ def get_timeline_events(n: int = None, start: str = None, end: str = None):
     r = requests.get(url)
     r = r.json()
 
+    # Add print statement for debugging
+    if start:
+        print(f"DEBUG: start: {start}")
+        # print events
+        for event in r:
+            print(event['created_at'])
+        print("----")
+
     # Filter the events based on start and end times if they are provided
     if start:
         r = [event for event in r if event['created_at'] >= start]

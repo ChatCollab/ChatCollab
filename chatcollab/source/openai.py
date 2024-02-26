@@ -66,8 +66,8 @@ def ask_chatgpt(query):
     Returns:
         response.json(): Json form of response from API
     """
-    if check_rate_limit():
-        return "Rate limit reached. Try again later."
+    # if check_rate_limit():
+    #     return "Rate limit reached. Try again later."
 
     response = ask_gpt_4(query, temperature=0.3)
 
