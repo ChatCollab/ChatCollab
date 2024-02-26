@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 import chatcollab.timeline.models as models
 from chatcollab.timeline.schemas import *
 import json
+from datetime import datetime
 
 filename_openai_log = "openai_log.json"
 
@@ -58,7 +59,7 @@ def create_event(public_key: str, private_key: str, event: EventCreateSchema, db
     agent.id = 0
 
     # Create the event for the agent
-    db_event = models.Event(title=event.title, source_id=agent.id, tags=event.tags, payload=event.payload)
+    db_event = models.Event(title=event.title, source_id=agent.id, tags=event.tags, payload=event.payload, created_at = datetime.now())
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
