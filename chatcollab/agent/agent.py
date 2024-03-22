@@ -99,8 +99,7 @@ def create_run_autonomous_agent(agent_name, description_of_role, persona, slack_
     timeout_val = 0
     while timeout_val<10 and random_id in get_allowed_agents() and time.time()-start_time<timeout_amt_of_time:
         talked = False
-        if True:
-        # try:
+        try:
             choice_result, context = choose_action(agent_name=agent_name, description_of_role=description_of_role, persona=persona, slack_channel=slack_channel, print_to_output=print_to_output)
             
             if choice_result==1 or choice_result==2:
@@ -116,21 +115,20 @@ def create_run_autonomous_agent(agent_name, description_of_role, persona, slack_
 
                 elif choice_result==2:
                     generate_file(agent_name, description_of_role, persona, slack_channel, print_to_output, full_events_list, context)
-        # except Exception as e:
-        #     print(e)
-        #     print("[CRITICAL] Error in agent, restarting in 3 seconds...")
-        #     time.sleep(1) #Note its 3 when you add the 2 at startup
-        #     timeout_val+=1
-        #     continue
+        except Exception as e:
+            print(e)
+            print("[CRITICAL] Error in agent, restarting in 3 seconds...")
+            time.sleep(1) # Note its 3 when you add the 2 at startup
+            timeout_val+=1
+            continue
 
         if talked:
             # End "..." signal
             post_timeline_event(title="Typing Indicator End", payload=f"...", tags=[f"from:{agent_name}", "type:event"])
 
         # Sleep to allow space for humans to respond, and reduce API usage
-        # time.sleep(2)
-        # Sleep random amount of time between 1-3 seconds
-        time.sleep(random.randint(1,15)) #2,2 for no variation, 1,15 for variation
+        # Sleep random amount of time between 5-15 seconds
+        time.sleep(random.randint(5,15))
     
     if random_id not in get_allowed_agents():
         print_to_output("[TERMINATED] Agent has been stopped as thread is closed. This means another browser has the admin app open, and since only one agent system can run at a time in the same slack, this session has been stopped.\n\n **Please reload this page to restart**\n\n")
@@ -204,19 +202,16 @@ Response (provide explaination first then the option):"""
 
     if "Option 1" in response:
         print("Time to talk...")
-        # print_to_output("Time to talk...")
         return 1, response
 
     elif "Option 2" in response:
         print("Time to generate file(s)...")
-        # print_to_output("Time to generate file(s)...")
         return 2, response
 
     elif "Option 3" in response:
         print("Not time to talk")
-        # print_to_output("Not time to talk")
 
-        if anyone_typing==False: # In other words, did agent possibly decide not to talk when no one else is typing? If so, skip. Otherwise, store the last prompt.
+        if anyone_typing==False: # In other words, did agent possibly decide not to talk only because another agent was typing? If so, skip. Otherwise, store the last prompt.
             globals()["last_prompt_with_no_as_response"][agent_name] = get_formatted_channel_history(slack_channel_id)
 
         return 3, None
@@ -251,7 +246,7 @@ def send_message(agent_name, description_of_role, persona, slack_channel, print_
         response = json.loads(response)
     except Exception as e:
         print(e)
-        print_to_output("[WARNING] Invalid JSON response, try again") # If happens, replace prompt for json with just output of the plain message.
+        print_to_output("[WARNING] Invalid JSON response, try again")
         raise Exception("Invalid JSON response, try again")
     
     response = replace_newlines_in_strings(response)
@@ -301,7 +296,6 @@ def generate_file(agent_name, description_of_role, persona, slack_channel, print
     prompt_for_action = task_prompt
 
     # Now execute prompt
-    # prompt = f"""<Persona>{persona}<Persona>\n\n<Instructions>{prompt_for_action}\n\nOutput ONLY the file(s) and their names. Include ALL the required content for the content to be complete and functional: No placeholders or comments for later completion. Omit ANY commentary, just provide the file(s).</Instructions>"""
     prompt = f"""\n\n<Instructions>{prompt_for_action}\n\nOutput ONLY the file(s) and their names. Include ALL the required content for the content to be complete and functional: No placeholders or comments for later completion. Omit ANY commentary, just provide the file(s).</Instructions>"""
 
     print("---- PROMPT [Lvl C.1]----")

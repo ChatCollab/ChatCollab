@@ -7,7 +7,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
 import json
 
-
 Base = declarative_base()
 
 def generate_key():

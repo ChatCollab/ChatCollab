@@ -1,16 +1,12 @@
 # Utility functions for ChatGPT
 
-#------- [IMPORT LIBRARIES] -------#
 import requests
 import os
 import json
 from datetime import datetime
 
-#------- [ENV VARIABLES] -------#
 openai_gpt_key = os.environ['OPENAI_GPT_KEY']
-
-#------- [VARIABLES] -------#
-globals()["weak_total_rate_limit"] = 5000 # This is weak because it does not use a persistent database to track usage.
+globals()["weak_total_rate_limit"] = 5000 # This is weak because the app does not use a persistent database to track usage.
 globals()["rate_limit_usage"] = 0
 
 
@@ -60,43 +56,16 @@ def check_rate_limit():
 
 
 def ask_chatgpt(query):
-    """Ask ChatGPT using Openai
+    """Ask GPT4 using OpenAI
     Inputs:
         query: String query to input to chatgpt4
     Returns:
         response.json(): Json form of response from API
     """
-    # if check_rate_limit():
-    #     return "Rate limit reached. Try again later."
 
     response = ask_gpt_4(query, temperature=0.3)
 
     return response
-
-# def ask_gpt_3(query, temperature=0.1):
-
-#     if check_rate_limit():
-#         return "Rate limit reached. Try again later."
-    
-#     # Ask ChatGPT3 using openai
-    
-#     url = 'https://api.openai.com/v1/chat/completions'
-#     headers = {
-#         'Content-Type': 'application/json',
-#         'Authorization': f'Bearer {openai_gpt_key}'
-#     }
-
-#     data = {
-#         "model": "gpt-3.5-turbo-1106",  # Model to use
-#         "messages": [{"role": "user", "content": query}],
-#         "temperature": temperature,
-#     }
-
-#     response = requests.post(url, headers=headers, json=data)
-#     response = response.json()["choices"][0]["message"]['content']
-#     log_openai_usage(query, response)
-    
-#     return response
 
 
 def ask_gpt_4(query, temperature=0.2):
@@ -104,8 +73,6 @@ def ask_gpt_4(query, temperature=0.2):
     if check_rate_limit():
         return "Rate limit reached. Try again later."
 
-    # Ask ChatGPT using openai
-    
     url = 'https://api.openai.com/v1/chat/completions'
     headers = {
         'Content-Type': 'application/json',
@@ -113,7 +80,7 @@ def ask_gpt_4(query, temperature=0.2):
     }
 
     data = {
-        "model": "gpt-4",  # Model to use
+        "model": "gpt-4",
         "messages": [{"role": "user", "content": query}],
         "temperature": temperature,
         "max_tokens": 2000,
@@ -122,5 +89,5 @@ def ask_gpt_4(query, temperature=0.2):
     response = requests.post(url, headers=headers, json=data)
     response = response.json()["choices"][0]["message"]['content']
     log_openai_usage(query, response)
-    
+       
     return response

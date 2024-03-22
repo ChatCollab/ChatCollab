@@ -11,7 +11,7 @@ def delete_all_messages_files_in_channel():
     s.conversations
 
     # delete all messages in -bots channels
-    for msg in s.msgs(filter(match('student-experiment'), s.conversations)): # Hard coded, TODO change
+    for msg in s.msgs(filter(match('personality-experiment'), s.conversations)): # Hard coded, TODO change
     # delete messages, its files, and all its replies (thread)
         msg.delete(replies=True, files=True)
 

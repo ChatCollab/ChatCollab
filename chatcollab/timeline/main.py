@@ -1,8 +1,9 @@
-# FastAPI for Interfacing with the Central Event Timeline (CET)
+# FastAPI for Interfacing with the Central Event Timeline
 
 #uvicorn timeline.main:app --reload
 
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 import chatcollab.timeline.models as models
 from chatcollab.timeline.schemas import *
@@ -72,9 +73,6 @@ def delete_events(db: Session = Depends(get_db)):
     db.commit()
     return {"message": "All events deleted"}
     
-
-from fastapi.responses import HTMLResponse
-
 @app.get("/agents", response_class=HTMLResponse)
 def get_html():
     return HTMLResponse(open("./chatcollab/timeline/templates/agents.html").read())
@@ -91,7 +89,7 @@ def get_openai_logs():
         with open(filename_openai_log, "r") as file:
             data = json.load(file)
 
-            # return new json with total number of logs, and frequency of logs for each represented hour and date
+            # Return new json with total number of logs, and frequency of logs for each represented hour and date
             total_logs = len(data)
             frequency = {}
             for log in data:

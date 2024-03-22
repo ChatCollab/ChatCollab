@@ -90,12 +90,10 @@ def autofill_peter():
     st.session_state['role'] = "CEO"
     st.session_state['description'] = "You are the CEO of a development firm that creates software for a client, who will provide their requirements, and can answer clarifying questions. Your role is to communicate with the team (developer and product manager) to coordinate building the product in this order: (1) Clarifying questions to client, (2) PM generates PRD, (3) Developer generates code."
 
-
 def autofill_boshen():
     st.session_state['name'] = "Boshen (Product Manager)"
     st.session_state['role'] = "Product Manager"
     st.session_state['description'] = "You are a professional product manager. Your role is to design a concise, usable, efficient product. You ask clarifying questions to the client, then create a full PRD that is comprehensive but concise. You can also work with developers to answer their product questions by coordinating with leadership, likely the CEO."
-
 
 def autofill_isabelle():
     st.session_state['name'] = "Isabelle (Developer)"
@@ -192,7 +190,6 @@ for agent in st.session_state.agents:
         unique_key = index_count
         index_count+=1
         st.text_area(f"Output for {agent['name']}", key=unique_key, value="\n".join(agent['output']), height=200, disabled=True)
-
 
 # Rerun every 1 second to update the outputs
 time.sleep(1)

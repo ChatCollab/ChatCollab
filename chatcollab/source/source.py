@@ -41,7 +41,7 @@ def run_slack_source(print_to_output):
                         time.sleep(1)
                         post_slack_message(channel=slack_channel_id, username=username, text=event['payload'])
                         
-                        post_timeline_event(title="Slack Message Sent", payload="Hello! The PRD looks great!", tags=["to:slack", "from:Peter Williams (AI)", "type:receipt"],new_private_key=private_key, new_public_key=public_key)
+                        post_timeline_event(title="Slack Message Sent", payload=event['payload'], tags=["to:slack", "from:Peter Williams (AI)", "type:receipt"],new_private_key=private_key, new_public_key=public_key)
                         
                         SHORT_list_of_executed_events.append(str(event['id'])+str(event['created_at']))
                         print("Done!")
