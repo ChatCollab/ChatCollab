@@ -6,10 +6,7 @@ import os
 import threading 
 import random
 
-# Set environment variable
 slack_channel_id = os.environ['SLACK_CHANNEL_ID']
-
-# File
 filename = 'allowed_threads.json'
 filename_openai_log = "openai_log.json"
 
@@ -57,13 +54,10 @@ if 'description' not in st.session_state:
     st.session_state['description'] = ""
 if 'knowledge' not in st.session_state:
     st.session_state['knowledge'] = "In our software team, the CEO coordinates the timeline for each project. The product manager and developers do not start work until it has been approved by the CEO. Once that occurs, the product manager first creates and shares a PRD with the team. Development does not start until this PRD is approved by the CEO. Then, the software with test cases is developed. It is important for all code to have strong documentation through inline comments."
-# Init in session
 if 'Agents_to_allow' not in st.session_state:
     st.session_state['Agents_to_allow'] = []
-
 if 'is_deleting' not in st.session_state:
     st.session_state.is_deleting = False
-
 
 # Function to wrap delete operation
 def delete_messages():
@@ -81,7 +75,7 @@ knowledge = st.text_area("Institutional Knowledge", value=st.session_state['know
 if st.button("Update Institutional Knowledge"):
     update_institutional_knowledge(knowledge)
 
-# add space
+# Add space
 st.markdown("---")
 
 # Callback functions to autofill
@@ -112,7 +106,6 @@ if st.button("Fill Isabelle (Developer)"):
 
 if st.button("Fill Peter (CEO)"):
     autofill_peter()
-
 
 if 'agents' not in st.session_state:
     st.session_state.agents = []

@@ -46,7 +46,6 @@ def get_timeline_events(n: int = None, start: str = None, end: str = None):
     
     url = f"http://localhost:8000/list_events/?public_key={public_key}&private_key={private_key}"
 
-    # make get request
     r = requests.get(url)
     r = r.json()
 

@@ -1,4 +1,15 @@
-# ChatCollab v3.2
+# ChatCollab v3.3
+
+### To setup the environment variables
+~~~
+OPENAI_GPT_KEY= OpenAI API Key
+~~~
+~~~
+SLACK_API_TOKEN= API key of Slack Bot added to your slack channel with full permissions
+~~~
+~~~
+SLACK_CHANNEL_ID= Slack channel ID of your Slack channel which must have "chatcollab" in the name to enable easy cleaning of AI messages
+~~~
 
 ### To build the docker image
 ~~~
@@ -9,7 +20,6 @@ docker build -f Dockerfile -t chatcollab:latest .
 ~~~
 docker run --env-file .env -p 8000:8000 -p 8080:8080 chatcollab:latest
 ~~~
-
 
 GUIDE:
 When done using ChatCollab, please follow these steps as best practice:

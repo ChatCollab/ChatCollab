@@ -151,7 +151,7 @@ def create_run_autonomous_agent(agent_name, description_of_role, persona, slack_
 # [Option 3] Do nothing and wait for another agent to speak
 
 
-# @v3.2
+# @v3.2, v3.3
 def choose_action(agent_name, description_of_role, persona, slack_channel, print_to_output):
 
     if get_formatted_channel_history(slack_channel_id)==globals()["last_prompt_with_no_as_response"][agent_name]:
@@ -220,7 +220,7 @@ Response (provide explaination first then the option):"""
         return 3, None
 
 
-# @v3.2
+# @v3.2, v3.3
 def send_message(agent_name, description_of_role, persona, slack_channel, print_to_output, full_events_list, context):
 
     knowledge = get_institutional_knowledge(full_events_list)
@@ -256,7 +256,7 @@ def send_message(agent_name, description_of_role, persona, slack_channel, print_
     return
 
 
-# @v3.2
+# @v3.2, v3.3
 def generate_file(agent_name, description_of_role, persona, slack_channel, print_to_output, full_events_list, context):
 
     # First create prompt
